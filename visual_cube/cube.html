@@ -1,0 +1,745 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nine Intersecting Circular Rings with Labeled Intersections</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>  
+        .cube-container {  
+          display: grid;  
+          grid-template-columns: repeat(3, 1fr);  
+          grid-template-rows: repeat(3, 1fr);  
+          gap: 20px;  
+          width: 100%;  
+          height: 100vh;  
+          background-color: white;  
+        }  
+    
+        .cube-face {  
+          display: grid;  
+          grid-template-columns: repeat(3, 1fr);  
+          grid-template-rows: repeat(3, 1fr);  
+          gap: 2px;  
+          padding: 20px;  
+          background-color: white;  
+          width: 300px;  
+          height: 300px;  
+        }  
+    
+        .cube-square {  
+          display: flex;  
+          justify-content: center;  
+          align-items: center;  
+          font-size: 12px;  
+          font-weight: bold;  
+          border-radius: 0%;  
+          width: 100%;  
+          height: 100%;  
+        }  
+    
+        .cube-square-dot {  
+          width: 50%;  
+          height: 50%;  
+          border-radius: 50%;  
+        }  
+    
+        .face-orientation {  
+          position: absolute;  
+          top: 10px;  
+          left: 10px;  
+          font-size: 14px;  
+          font-weight: bold;  
+        }  
+    
+        .face-color-0 {  
+          background-color: rgba(110, 108, 108, 0.524);
+        }  
+    
+        .face-color-1 {  
+          background-color: rgba(110, 108, 108, 0.524);  
+        }  
+    
+        .face-color-2 {  
+          background-color: rgba(110, 108, 108, 0.524); 
+        }  
+    
+        .face-color-3 {  
+          background-color: rgba(110, 108, 108, 0.524);
+        }  
+    
+        .face-color-4 {  
+          background-color: rgba(110, 108, 108, 0.524);
+        }  
+    
+        .face-color-5 {  
+          background-color: rgba(110, 108, 108, 0.524); 
+        }  
+    
+        .face-color-white {  
+          background-color: white;  
+        }  
+      </style>  
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4">Nine Intersecting Circular Rings with Labeled Intersections</h1>
+        <svg id="ringsChart" width="600" height="400" viewBox="-120 -150 260 260"></svg>
+        <div id="intersectionPoints" class="mt-4"></div>
+    </div>
+    <div id="data-grid" class="grid grid-cols-3 gap-4"></div>  
+    <div class="cube-container" id="cube-container"></div>
+
+    <script>
+        const svg = document.getElementById('ringsChart');
+        const intersectionPointsDiv = document.getElementById('intersectionPoints');
+        const colors = ['rgba(255, 107, 107, 0.6)', 'rgba(78, 205, 196, 0.6)', 'rgba(69, 183, 209, 0.6)'];
+        const centers = [
+            [-50, 0],   // X center
+            [50, 0],    // Y center
+            [0, -60]    // Z center
+        ];
+        const radii = [
+            [80, 95, 110], // X radii
+            [80, 95, 110], // Y radii
+            [80, 95, 110]  // Z radii
+        ];
+        const labels = ['X', 'Y', 'Z'];
+
+        const data ={  
+            "1": 1,  
+            "2": 2,  
+            "3": 3,  
+            "4": 4,  
+            "5": 5,  
+            "6": 6,  
+            "7": 7,  
+            "8": 8,  
+            "9": 9,  
+            "10": 10,  
+            "11": 11,  
+            "12": 12,  
+            "13": 13,  
+            "14": 14,  
+            "15": 15,  
+            "16": 16,  
+            "17": 17,  
+            "18": 18,  
+            "19": 19,  
+            "20": 20,  
+            "21": 21,  
+            "22": 22,  
+            "23": 23,  
+            "24": 24,  
+            "25": 25,  
+            "26": 26,  
+            "27": 27,  
+            "28": 28,  
+            "29": 29,  
+            "30": 30,  
+            "31": 31,  
+            "32": 32,  
+            "33": 33,  
+            "34": 34,  
+            "35": 35,  
+            "36": 36,  
+            "37": 37,  
+            "38": 38,  
+            "39": 39,  
+            "40": 40,  
+            "41": 41,  
+            "42": 42,  
+            "43": 43,  
+            "44": 44,  
+            "45": 45,  
+            "46": 46,  
+            "47": 47,  
+            "48": 48,  
+            "49": 49,  
+            "50": 50,  
+            "51": 51,  
+            "52": 52,  
+            "53": 53,  
+            "54": 54  
+            };
+        const colorDict = 
+            {
+            '1': '#FF0000',
+            '3': '#FF0000',
+            '5': '#FF0000',
+            '7': '#FF0000',
+            '9': '#FF0000',
+            '11': '#FF0000',
+            '13': '#FF0000',
+            '15': '#FF0000',
+            '17': '#FF0000',
+            '2': '#00FF00',
+            '4': '#00FF00',
+            '6': '#00FF00',
+            '8': '#00FF00',
+            '10': '#00FF00',
+            '12': '#00FF00',
+            '14': '#00FF00',
+            '16': '#00FF00',
+            '18': '#00FF00',
+            '19': '#0000FF',
+            '21': '#0000FF',
+            '23': '#0000FF',
+            '25': '#0000FF',
+            '27': '#0000FF',
+            '29': '#0000FF',
+            '31': '#0000FF',
+            '33': '#0000FF',
+            '35': '#0000FF',
+            '20': '#FFFF00',
+            '22': '#FFFF00',
+            '24': '#FFFF00',
+            '26': '#FFFF00',
+            '28': '#FFFF00',
+            '30': '#FFFF00',
+            '32': '#FFFF00',
+            '34': '#FFFF00',
+            '36': '#FFFF00',
+            '37': '#00FFFF',
+            '39': '#00FFFF',
+            '41': '#00FFFF',
+            '43': '#00FFFF',
+            '45': '#00FFFF',
+            '47': '#00FFFF',
+            '49': '#00FFFF',
+            '51': '#00FFFF',
+            '53': '#00FFFF',
+            '38': '#FF00FF',
+            '40': '#FF00FF',
+            '42': '#FF00FF',
+            '44': '#FF00FF',
+            '46': '#FF00FF',
+            '48': '#FF00FF',
+            '50': '#FF00FF',
+            '52': '#FF00FF',
+            '54': '#FF00FF'
+            }
+
+        const ringRotateData = {  
+            'x0':[[{23: 23},{21: 21},{19: 19}],[{5: 5},{3: 3},{1: 1}],[{20: 20}, {22: 22}, {24: 24}],[{2: 2}, {4: 4}, {6: 6}]],  
+            'x1':[[{29: 29},{27: 27},{25: 25}],[{11: 11},{9: 9},{7: 7}],[{26: 26}, {28: 28}, {30: 30}],[{8: 8}, {10: 10}, {12: 12}]],  
+            'x2':[[{35: 35},{33: 33},{31: 31}],[{17: 17},{15: 15},{13: 13}],[{32: 32}, {34: 34}, {36: 36}],[{14: 14}, {16: 16}, {18: 18}]],  
+            'y0':[[{14: 14},{8: 8},{2: 2}],[{41: 41},{39: 39},{37: 37}],[{1: 1},{7: 7},{13: 13}],[{38: 38}, {40: 40}, {42: 42}]],  
+            'y1':[[{16: 16},{10: 10},{4: 4}],[{47: 47},{45: 45},{43: 43}],[{3: 3},{9: 9},{15: 15}],[{44: 44}, {46: 46}, {48: 48}]],  
+            'y2':[[{18: 18},{12: 12},{6: 6}],[{53: 53},{51: 51},{49: 49}],[{5: 5},{11: 11},{17: 17}],[{50: 50}, {52: 52}, {54: 54}]],  
+            'z0':[[{50: 50},{44: 44},{38: 38}],[{32: 32},{26: 26},{20: 20}],[{37: 37},{43: 43},{49: 49}],[{19: 19},{25: 25},{31: 31}]],  
+            'z1':[[{52: 52},{46: 46},{40: 40}],[{34: 34},{28: 28},{22: 22}],[{39: 39},{45: 45},{51: 51}],[{21: 21},{27: 27},{33: 33}]],  
+            'z2':[[{54: 54},{48: 48},{42: 42}],[{36: 36},{30: 30},{24: 24}],[{41: 41},{47: 47},{53: 53}],[{23: 23},{29: 29},{35: 35}]]  
+            }; 
+
+    const faceOrder = [
+      { name: "左", index: 3, col: 1, row: 2, color: 0 },
+      { name: "前", index: 0, col: 2, row: 2, color: 1 },
+      { name: "右", index: 4, col: 3, row: 2, color: 2 },
+      { name: "背", index: 5, col: 4, row: 2, color: 3 },
+      { name: "顶", index: 1, col: 2, row: 1, color: 4 },
+      { name: "底", index: 2, col: 2, row: 3, color: 5 }
+    ];
+
+    const cubeSquares = {};
+    const cubeMatrix = {};
+    const cubeRingMapMtrix ={
+            '1':20,
+            '2':26,
+            '3':32,
+            '4':22,
+            '5':28,
+            '6':34,
+            '7':24,
+            '8':30,
+            '9':36,
+            '10':5,
+            '11':11,
+            '12':17,
+            '13':3,
+            '14':9,
+            '15':15,
+            '16':1,
+            '17':7,
+            '18':13,
+            '19':2,
+            '20':8,
+            '21':14,
+            '22':4,
+            '23':10,
+            '24':16,
+            '25':6,
+            '26':12,
+            '27':18,
+            '28':49,
+            '29':43,
+            '30':37,
+            '31':51,
+            '32':45,
+            '33':39,
+            '34':53,
+            '35':47,
+            '36':41,
+            '37':38,
+            '38':44,
+            '39':50,
+            '40':40,
+            '41':46,
+            '42':52,
+            '43':42,
+            '44':48,
+            '45':54,
+            '46':31,
+            '47':25,
+            '48':19,
+            '49':33,
+            '50':27,
+            '51':21,
+            '52':35,
+            '53':29,
+            '54':23
+        };
+
+
+        function drawRings() {
+            svg.innerHTML = '';
+            centers.forEach((center, groupIndex) => {
+                const [cx, cy] = center;
+                radii[groupIndex].forEach((radius, i) => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', cx);
+                    circle.setAttribute('cy', cy);
+                    circle.setAttribute('r', radius);
+                    circle.setAttribute('fill', 'none');
+                    circle.setAttribute('stroke', colors[groupIndex]);
+                    circle.setAttribute('stroke-width', '2');
+                    svg.appendChild(circle);
+
+                    // Add label
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    const angle = -Math.PI / 2 + (Math.PI / 6) * (groupIndex * 2 + 1);
+                    const labelX = cx + (radius + 10) * Math.cos(angle);
+                    const labelY = cy + (radius + 10) * Math.sin(angle);
+                    label.setAttribute('x', labelX);
+                    label.setAttribute('y', labelY);
+                    label.setAttribute('font-size', '12');
+                    label.setAttribute('fill', colors[groupIndex]);
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('dominant-baseline', 'middle');
+                    label.textContent = `${labels[groupIndex]}${i}`;
+                    svg.appendChild(label);
+                });
+            });
+        }
+
+        function findIntersections() {
+            const intersections = [];
+            let intersectionId = 1;
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = i + 1; j < 3; j++) {
+                    const [cx1, cy1] = centers[i];
+                    const [cx2, cy2] = centers[j];
+                    
+                    for (let r1 of radii[i]) {
+                        for (let r2 of radii[j]) {
+                            const dx = cx2 - cx1;
+                            const dy = cy2 - cy1;
+                            const d = Math.sqrt(dx * dx + dy * dy);
+
+                            if (d <= r1 + r2 && d >= Math.abs(r1 - r2)) {
+                                const a = (r1 * r1 - r2 * r2 + d * d) / (2 * d);
+                                const h = Math.sqrt(r1 * r1 - a * a);
+
+                                const px = cx1 + a * (cx2 - cx1) / d;
+                                const py = cy1 + a * (cy2 - cy1) / d;
+
+                                const intersectionX1 = px + h * (cy2 - cy1) / d;
+                                const intersectionY1 = py - h * (cx2 - cx1) / d;
+
+                                const intersectionX2 = px - h * (cy2 - cy1) / d;
+                                const intersectionY2 = py + h * (cx2 - cx1) / d;
+
+                                intersections.push({
+                                    id: intersectionId++,
+                                    x: intersectionX1,
+                                    y: intersectionY1,
+                                    groups: [labels[i], labels[j]],
+                                    position: 'upper'
+                                });
+
+                                intersections.push({
+                                    id: intersectionId++,
+                                    x: intersectionX2,
+                                    y: intersectionY2,
+                                    groups: [labels[i], labels[j]],
+                                    position: 'lower'
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return intersections;
+        }
+
+        function getXYFromId(intersections,id) {  
+            const intersection = intersections.find(item => item.id === id);  
+            if (intersection) {  
+                return { x: intersection.x, y: intersection.y };  
+            } else {  
+                return { x: null, y: null };  
+            }  
+        } 
+
+
+        function labelIntersections(intersections, data, colorDict) {  
+            Object.entries(data).forEach( 
+                ([key, value]) => { 
+                    const intersectionId = parseInt(key);  
+                    const { x, y } = getXYFromId(intersections, intersectionId);  
+
+                    // Create the label  
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');  
+                    label.setAttribute('x', x);  
+                    label.setAttribute('y', y);  
+                    label.setAttribute('font-size', '8');  
+                    label.setAttribute('fill', 'black');  
+                    label.setAttribute('text-anchor', 'middle');  
+                    label.setAttribute('dominant-baseline', 'middle');  
+                    label.textContent = value;  
+                    svg.appendChild(label);  
+
+                    
+                    // Create the circle  
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');  
+                    circle.setAttribute('cx', x);  
+                    circle.setAttribute('cy', y);  
+                    circle.setAttribute('r', '5');  
+                    circle.setAttribute('fill', colorDict[value]);  
+                    svg.appendChild(circle);  
+                    /**/
+                    
+                });   
+        }  
+        function groupIntersections(intersections) {
+            const groups = {
+                'X-Y': { upper: [], lower: [] },
+                'X-Z': { upper: [], lower: [] },
+                'Y-Z': { upper: [], lower: [] }
+            };
+            intersections.forEach(intersection => {
+                const [group1, group2] = intersection.groups;
+                const groupKey = `${group1}-${group2}`;
+                groups[groupKey][intersection.position].push(intersection.id);
+            });
+            return groups;
+        }
+
+        function displayGroupedIntersections(groups) {
+            let html = '<h2 class="text-xl font-semibold mt-4 mb-2">Grouped Intersection Points:</h2>';
+            for (const [group, positions] of Object.entries(groups)) {
+                html += `<p><strong>${group} (Upper):</strong> [${positions.upper.join(', ')}]</p>`;
+                html += `<p><strong>${group} (Lower):</strong> [${positions.lower.join(', ')}]</p>`;
+            }
+            intersectionPointsDiv.innerHTML = html;
+        }
+
+        function rotateData(data, axis, direction,visualData) {  
+            // 获取指定轴的数据  
+            const axisData = data[axis];  
+            const result = [];
+            
+            if (direction === 'clockwise') { 
+                const tmp0 = axisData[3][0][Object.keys(axisData[3][0])]
+                const tmp1 = axisData[3][1][Object.keys(axisData[3][1])]
+                const tmp2 = axisData[3][2][Object.keys(axisData[3][2])]
+
+                visualData[Object.keys(axisData[3][0])] = axisData[2][0][Object.keys(axisData[2][0])]
+                visualData[Object.keys(axisData[3][1])] = axisData[2][1][Object.keys(axisData[2][1])]
+                visualData[Object.keys(axisData[3][2])] = axisData[2][2][Object.keys(axisData[2][2])]
+
+                visualData[Object.keys(axisData[2][0])] = axisData[1][0][Object.keys(axisData[1][0])]
+                visualData[Object.keys(axisData[2][1])] = axisData[1][1][Object.keys(axisData[1][1])]
+                visualData[Object.keys(axisData[2][2])] = axisData[1][2][Object.keys(axisData[1][2])]
+
+                visualData[Object.keys(axisData[1][0])] = axisData[0][0][Object.keys(axisData[0][0])]
+                visualData[Object.keys(axisData[1][1])] = axisData[0][1][Object.keys(axisData[0][1])]
+                visualData[Object.keys(axisData[1][2])] = axisData[0][2][Object.keys(axisData[0][2])]
+
+                visualData[Object.keys(axisData[0][0])] = tmp0
+                visualData[Object.keys(axisData[0][1])] = tmp1
+                visualData[Object.keys(axisData[0][2])] = tmp2
+
+                axisData[3][0][Object.keys(axisData[3][0])] = axisData[2][0][Object.keys(axisData[2][0])]
+                axisData[3][1][Object.keys(axisData[3][1])] = axisData[2][1][Object.keys(axisData[2][1])]
+                axisData[3][2][Object.keys(axisData[3][2])] = axisData[2][2][Object.keys(axisData[2][2])]
+
+                axisData[2][0][Object.keys(axisData[2][0])] = axisData[1][0][Object.keys(axisData[1][0])]
+                axisData[2][1][Object.keys(axisData[2][1])] = axisData[1][1][Object.keys(axisData[1][1])]
+                axisData[2][2][Object.keys(axisData[2][2])] = axisData[1][2][Object.keys(axisData[1][2])]
+
+                axisData[1][0][Object.keys(axisData[1][0])] = axisData[0][0][Object.keys(axisData[0][0])]
+                axisData[1][1][Object.keys(axisData[1][1])] = axisData[0][1][Object.keys(axisData[0][1])]
+                axisData[1][2][Object.keys(axisData[1][2])] = axisData[0][2][Object.keys(axisData[0][2])]
+
+                axisData[0][0][Object.keys(axisData[0][0])] = tmp0
+                axisData[0][1][Object.keys(axisData[0][1])] = tmp1
+                axisData[0][2][Object.keys(axisData[0][2])] = tmp2
+                
+                console.log(axisData);
+                console.log(visualData);
+             }
+             else{
+                const tmp0 = axisData[0][0][Object.keys(axisData[0][0])]
+                const tmp1 = axisData[0][1][Object.keys(axisData[0][1])]
+                const tmp2 = axisData[0][2][Object.keys(axisData[0][2])]
+
+                visualData[Object.keys(axisData[0][0])] = axisData[1][0][Object.keys(axisData[1][0])]
+                visualData[Object.keys(axisData[0][1])] = axisData[1][1][Object.keys(axisData[1][1])]
+                visualData[Object.keys(axisData[0][2])] = axisData[1][2][Object.keys(axisData[1][2])]
+
+                visualData[Object.keys(axisData[1][0])] = axisData[2][0][Object.keys(axisData[2][0])]
+                visualData[Object.keys(axisData[1][1])] = axisData[2][1][Object.keys(axisData[2][1])]
+                visualData[Object.keys(axisData[1][2])] = axisData[2][2][Object.keys(axisData[2][2])]
+
+                visualData[Object.keys(axisData[2][0])] = axisData[3][0][Object.keys(axisData[3][0])]
+                visualData[Object.keys(axisData[2][1])] = axisData[3][1][Object.keys(axisData[3][1])]
+                visualData[Object.keys(axisData[2][2])] = axisData[3][2][Object.keys(axisData[3][2])]
+
+                visualData[Object.keys(axisData[3][0])] = tmp0
+                visualData[Object.keys(axisData[3][1])] = tmp1
+                visualData[Object.keys(axisData[3][2])] = tmp2
+
+                axisData[0][0][Object.keys(axisData[0][0])] = axisData[1][0][Object.keys(axisData[1][0])]
+                axisData[0][0][Object.keys(axisData[0][1])] = axisData[1][1][Object.keys(axisData[1][1])]
+                axisData[0][0][Object.keys(axisData[0][2])] = axisData[1][2][Object.keys(axisData[1][2])]
+
+                axisData[1][0][Object.keys(axisData[1][0])] = axisData[2][0][Object.keys(axisData[2][0])]
+                axisData[1][0][Object.keys(axisData[1][1])] = axisData[2][1][Object.keys(axisData[2][1])]
+                axisData[1][0][Object.keys(axisData[1][2])] = axisData[2][2][Object.keys(axisData[2][2])]
+
+                axisData[2][0][Object.keys(axisData[2][0])] = axisData[3][0][Object.keys(axisData[3][0])]
+                axisData[2][0][Object.keys(axisData[2][1])] = axisData[3][1][Object.keys(axisData[3][1])]
+                axisData[2][0][Object.keys(axisData[2][2])] = axisData[3][2][Object.keys(axisData[3][2])]
+
+                axisData[3][0][Object.keys(axisData[3][0])] = tmp0
+                axisData[3][0][Object.keys(axisData[3][1])] = tmp1
+                axisData[3][0][Object.keys(axisData[3][2])] = tmp2
+
+                
+                //console.log(axisData);
+                //console.log(visualData);
+             }
+            return data; 
+        }  
+
+        function rotateDataF(data, rotatedData) {
+            const dataDict = data;
+            const rotatedDataCopy = JSON.parse(JSON.stringify(rotatedData));
+
+            for (const axis in rotatedDataCopy) {
+                for (let i = 0; i < rotatedDataCopy[axis].length; i++) {
+                for (let j = 0; j < rotatedDataCopy[axis][i].length; j++) {
+                    const middleDict = rotatedDataCopy[axis][i][j];
+                    rotatedDataCopy[axis][i][j][Object.keys(middleDict)] = dataDict[Object.keys(middleDict)];
+                }
+                }
+            }
+            //console.log('-------');
+            //console.log(rotatedDataCopy);
+            return rotatedDataCopy;
+            }
+        
+
+
+    function convertToThreeByThree(arr) {
+        const result = [];
+
+        for (let i = 0; i < arr.length; i += 3) {
+            const row = arr.slice(i, i + 3);
+            result.push(row);
+        }
+
+        return result;
+    }
+
+    function ring_jiaodian_ID_juzhen(groupedIntersections){
+        const result = [];
+        for (const [group, positions] of Object.entries(groupedIntersections)){
+            for (const [group0, positions0] of Object.entries(positions)){
+                const threeByThree = convertToThreeByThree(positions0);  
+                result.push(threeByThree)
+
+            }
+
+        }
+        console.log(result)
+        return result
+
+    }
+
+    function generateCubeSquares() {
+      faceOrder.forEach((face, index) => {
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col < 3; col++) {
+            const squareId = `${face.index * 9 + row * 3 + col + 1}`;
+            const centerX = (col + 0.5) * 100 / 3 + (face.col - 2) * 100;
+            const centerY = (row + 0.5) * 100 / 3 + (face.row - 2) * 100;
+            cubeSquares[squareId] = {
+              face: face.name,
+              index: face.index * 9 + row * 3 + col + 1,
+              centerX,
+              centerY
+            };
+            cubeMatrix[squareId] = {
+              label: squareId,
+              color: `face-color-${face.color}`
+            };
+          }
+        }
+      });
+    }
+
+    function renderCube() {
+      const cubeContainer = document.getElementById("cube-container");
+
+      faceOrder.forEach((face, index) => {
+        const faceElement = document.createElement("div");
+        faceElement.classList.add("cube-face", `face-color-${face.color}`);
+        faceElement.style.gridColumn = face.col;
+        faceElement.style.gridRow = face.row;
+
+        const faceOrientationElement = document.createElement("div");
+        faceOrientationElement.classList.add("face-orientation");
+        faceOrientationElement.textContent = face.name;
+        faceElement.appendChild(faceOrientationElement);
+
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col < 3; col++) {
+            const squareId = `${face.index * 9 + row * 3 + col + 1}`;
+            const squareElement = document.createElement("div"); 
+            const label = data[cubeRingMapMtrix[String(squareId)]];
+            const cubeColor = colorDict[label];
+            squareElement.classList.add("cube-square",);//cubeColor );//;cubeMatrix[squareId].color);
+
+            squareElement.style.color = cubeColor; 
+            squareElement.style.backgroundColor = cubeColor; 
+
+            squareElement.textContent = label ;// cubeMatrix[squareId].label;
+            faceElement.appendChild(squareElement);
+            cubeSquares[squareId].element = squareElement;
+          }
+        }
+
+        cubeContainer.appendChild(faceElement);
+      });
+    }
+
+
+    function initializeAndDisplay(data, colorDict) {  
+        drawRings();  
+        const intersections = findIntersections();   
+        const groupedIntersections = groupIntersections(intersections);  
+        labelIntersections(intersections, data, colorDict);  
+        displayGroupedIntersections(groupedIntersections);  
+        generateCubeSquares();  
+        renderCube();  
+        return [data,intersections];
+    } 
+
+
+    function performOperations(intersections,ringRotateData,data, colorDict, axisWise, colockWise) {
+        const rotatedData = rotateData(ringRotateData, axisWise, colockWise, data); 
+        const rotatedDataCopy = rotateDataF(data, rotatedData);
+
+        labelIntersections(intersections, data, colorDict);
+        renderCube();
+        return [ringRotateData,data];
+
+    }
+
+    function batchRotateRings(moveList, intersections, ringRotateData, data, colorDict) {
+        for (const index in moveList) {
+            const moveStep = moveList[index];
+            const key = Object.getOwnPropertyNames(moveStep);
+            [ringRotateData, datachange] = performOperations(
+                intersections,
+                ringRotateData,
+                data,
+                colorDict,
+                key,
+                moveStep[key]
+            );
+        }
+        return [ringRotateData, datachange];
+    }
+
+
+    const [data1,intersections1] = initializeAndDisplay(data, colorDict);
+
+    const moveList = [{'z2':'clockwise'},{'y1':'clockunwise'}];
+
+    [ringRotateData1,datachange] = batchRotateRings(moveList,intersections1,ringRotateData,data1, colorDict );
+
+
+        /*
+        drawRings();
+        const intersections = findIntersections(); 
+        const groupedIntersections = groupIntersections(intersections);
+        //const ringJiaodianIDArr = ring_jiaodian_ID_juzhen(groupedIntersections); //3组圆环交点位置确定，ID
+
+        labelIntersections(intersections,data,colorDict); //圆环上实时点显示，圆环显示值变化可以通过ringJiaodianIDArr变化驱动
+        //labelIntersections(intersections,ringJiaodianIDArr); //圆环上实时点显示，圆环显示值变化可以通过ringJiaodianIDArr变化驱动
+        displayGroupedIntersections(groupedIntersections); //显示三组圆环交点坐标对应ID编号
+        generateCubeSquares();
+        renderCube();
+        
+        const rotatedData = rotateData(ringRotateData, 'z2', 'clockwise',data); 
+        const rotatedDataCopy = rotateDataF(data, rotatedData);
+
+        labelIntersections(intersections,data,colorDict); //圆环上实时点显示，圆环显示值变化可以通过ringJiaodianIDArr变化驱动
+
+        const rotatedData1 = rotateData(rotatedDataCopy, 'y2', 'clockwise',data); 
+        const rotatedDataCopy1 = rotateDataF(data, rotatedData1);
+
+        labelIntersections(intersections,data,colorDict);
+        
+        
+
+        const rotatedData = rotateData(ringRotateData, 'x2', 'clockunwise',data); 
+        const rotatedDataCopy = rotateDataF(data, rotatedData);
+
+        labelIntersections(intersections,data,colorDict); //圆环上实时点显示，圆环显示值变化可以通过ringJiaodianIDArr变化驱动
+        renderCube();
+
+        const rotatedData1 = rotateData(rotatedDataCopy, 'y2', 'clockwise',data); 
+        const rotatedDataCopy1 = rotateDataF(data, rotatedData1);
+
+        labelIntersections(intersections,data,colorDict);
+        renderCube();
+
+    //[ringRotateData1,datachange] = performOperations(intersections1,ringRotateData,data1, colorDict,'z2', 'clockwise');
+
+    //[ringRotateData1,datachange] = performOperations(intersections1,ringRotateData1,datachange, colorDict,'z2', 'clockunwise');
+     const moveList = [{'z2':'clockwise'},{'z2':'clockunwise'}];
+
+        for ( const index in moveList ){
+        const moveStep = moveList[index];
+        const key =  Object.getOwnPropertyNames(moveStep); 
+        [ringRotateData1,datachange] = performOperations(intersections1,ringRotateData,data1, colorDict,key,moveStep[key] );
+    }
+        */
+
+
+
+        
+
+    //console.log(cubeSquares);
+
+    </script>
+</body>
+</html>
